@@ -2,6 +2,7 @@ package arora.kushank.easyshare;
 
 import android.Manifest;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -101,12 +102,12 @@ public class SendOrRecieve extends AppCompatActivity {
             ArrayList<String> filenames = new ArrayList<>();
             if (clipData == null) {
                 String filename = data.getData().getPath();
-                filename=modifyIfInvalid(filename,data.getData());
+                filename=modifyIfInvalid(this,filename,data.getData());
                 filenames.add(filename);
             } else {
                 for (int i = 0; i < clipData.getItemCount(); i++) {
                     String filename = clipData.getItemAt(i).getUri().getPath();
-                    filename=modifyIfInvalid(filename,clipData.getItemAt(i).getUri());
+                    filename=modifyIfInvalid(this,filename,clipData.getItemAt(i).getUri());
                     filenames.add(filename);
                 }
             }
@@ -124,7 +125,7 @@ public class SendOrRecieve extends AppCompatActivity {
         }
     }
 
-    private String modifyIfInvalid(String filename,Uri dataURI) {
+    public static String modifyIfInvalid(Context context, String filename, Uri dataURI) {
         boolean gotError = false;
         try {
             File myFile = new File(filename);
@@ -141,21 +142,21 @@ public class SendOrRecieve extends AppCompatActivity {
         if (gotError) {
             Log.d(TAG,"gotError");
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(dataURI, filePathColumn, null, null, null);
+            Cursor cursor = context.getContentResolver().query(dataURI, filePathColumn, null, null, null);
             Log.d(TAG,"Trying to read it as image");
             if(cursor==null) {
                 filePathColumn[0]=MediaStore.Video.Media.DATA;
-                cursor = getContentResolver().query(dataURI, filePathColumn, null, null, null);
+                cursor = context.getContentResolver().query(dataURI, filePathColumn, null, null, null);
                 Log.d(TAG,"Trying to read it as video");
             }
             if(cursor==null){
                 filePathColumn[0]=MediaStore.Audio.Media.DATA;
-                cursor = getContentResolver().query(dataURI, filePathColumn, null, null, null);
+                cursor = context.getContentResolver().query(dataURI, filePathColumn, null, null, null);
                 Log.d(TAG,"Trying to read it as audio");
             }
             if(cursor==null){
                 filePathColumn[0]=MediaStore.Files.FileColumns.DATA;
-                cursor = getContentResolver().query(dataURI, filePathColumn, null, null, null);
+                cursor = context.getContentResolver().query(dataURI, filePathColumn, null, null, null);
                 Log.d(TAG,"Trying to read it as file");
             }
             if (cursor != null) {

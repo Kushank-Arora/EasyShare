@@ -18,14 +18,21 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".InitActivity">
             <intent-filter>
-                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <data android:mimeType="*/*"/>
             </intent-filter>
         </activity>
         <activity android:name=".FillName" />
         <activity android:name=".SendOrRecieve" />
-        <activity android:name=".SendActivity" />
+        <activity android:name=".SendActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*"/>
+
+            </intent-filter>
+        </activity>
         <activity
             android:name=".StatusActivity"
             android:theme="@style/Theme.AppCompat.Dialog" />

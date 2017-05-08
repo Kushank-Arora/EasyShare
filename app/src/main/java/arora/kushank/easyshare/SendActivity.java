@@ -1,9 +1,12 @@
 package arora.kushank.easyshare;
 
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -67,8 +70,28 @@ public class SendActivity extends AppCompatActivity implements SwipeRefreshLayou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
 
-        final Bundle myBasket = getIntent().getExtras();
+        Intent gotIntent=getIntent();
+        final Bundle myBasket = gotIntent.getExtras();
         filesToBeSent = myBasket.getStringArrayList(FILE_ADDRESS);
+
+        if(filesToBeSent==null){
+            ClipData clipData = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                clipData = gotIntent.getClipData();
+            }
+            filesToBeSent = new ArrayList<>();
+            if (clipData == null) {
+                String filename = gotIntent.getData().getPath();
+                filename=SendOrRecieve.modifyIfInvalid(this,filename,gotIntent.getData());
+                filesToBeSent.add(filename);
+            } else {
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    String filename = clipData.getItemAt(i).getUri().getPath();
+                    filename=SendOrRecieve.modifyIfInvalid(this,filename,clipData.getItemAt(i).getUri());
+                    filesToBeSent.add(filename);
+                }
+            }
+        }
 
         initViews();
         setListeners();
